@@ -28,6 +28,21 @@ class ChessGame {
                 pawn: '♟'
             }
         };
+        // 记录棋子是否移动过（用于王车易位）
+        this.piecesMoved = {
+            white: {
+                king: false,
+                rook1: false, // 左上角车
+                rook2: false  // 右上角车
+            },
+            black: {
+                king: false,
+                rook1: false,
+                rook2: false
+            }
+        };
+        // 记录吃过路兵的信息
+        this.enPassantTarget = null;
         
         this.initializeBoard();
         this.renderBoard();
@@ -308,8 +323,22 @@ class ChessGame {
         
         // 过滤掉无效移动（出界或移动到自己棋子上）
         return moves.filter(([moveRow, moveCol]) => {
-            return this.isInBounds(moveRow, moveCol) && 
-                   (!this.board[moveRow][moveCol] || this.board[moveRow][moveCol].color !== piece.color);
+            // 检查是否在棋盘内
+            if (!this.isInBounds(moveRow, moveCol)) return false;
+            
+            // 检查目标位置的棋子
+            const targetPiece = this.board[moveRow][moveCol];
+            
+            // 不能移动到自己棋子上
+            if (targetPiece && targetPiece.color === piece.color) return false;
+            
+            // 不能直接吃掉对方国王（根据国际象棋规则，国王不能被吃，游戏应该在将死时结束）
+            if (targetPiece && targetPiece.type === 'king') return false;
+            
+            return true;
+        }).filter(([moveRow, moveCol]) => {
+            // 过滤掉会导致自己被将军的移动
+            return !this.wouldBeInCheck(row, col, moveRow, moveCol);
         });
     }
     
@@ -334,10 +363,15 @@ class ChessGame {
         for (const colOffset of [-1, 1]) {
             const newRow = row + direction;
             const newCol = col + colOffset;
-            if (this.isInBounds(newRow, newCol) && 
-                this.board[newRow][newCol] && 
-                this.board[newRow][newCol].color !== piece.color) {
-                moves.push([newRow, newCol]);
+            if (this.isInBounds(newRow, newCol)) {
+                // 普通吃子
+                if (this.board[newRow][newCol] && this.board[newRow][newCol].color !== piece.color) {
+                    moves.push([newRow, newCol]);
+                }
+                // 吃过路兵
+                else if (this.enPassantTarget && this.enPassantTarget.row === newRow && this.enPassantTarget.col === newCol) {
+                    moves.push([newRow, newCol]);
+                }
             }
         }
         
@@ -415,6 +449,7 @@ class ChessGame {
     
     // 王的移动
     getKingMoves(row, col) {
+        const piece = this.board[row][col];
         const moves = [];
         const kingMoves = [
             [-1, -1], [-1, 0], [-1, 1],
@@ -426,6 +461,27 @@ class ChessGame {
             const newRow = row + dRow;
             const newCol = col + dCol;
             moves.push([newRow, newCol]);
+        }
+        
+        // 王车易位
+        if (!this.piecesMoved[piece.color].king && !this.isInCheck(piece.color)) {
+            // 短易位（王翼易位）
+            if (!this.piecesMoved[piece.color].rook2 && 
+                !this.board[row][col + 1] && 
+                !this.board[row][col + 2] &&
+                !this.isSquareAttacked(row, col + 1, piece.color) &&
+                !this.isSquareAttacked(row, col + 2, piece.color)) {
+                moves.push([row, col + 2]); // 王的目标位置
+            }
+            // 长易位（后翼易位）
+            if (!this.piecesMoved[piece.color].rook1 && 
+                !this.board[row][col - 1] && 
+                !this.board[row][col - 2] &&
+                !this.board[row][col - 3] &&
+                !this.isSquareAttacked(row, col - 1, piece.color) &&
+                !this.isSquareAttacked(row, col - 2, piece.color)) {
+                moves.push([row, col - 2]); // 王的目标位置
+            }
         }
         
         return moves;
@@ -443,20 +499,81 @@ class ChessGame {
     
     // 执行移动
     makeMove(fromRow, fromCol, toRow, toCol) {
+        const piece = this.board[fromRow][fromCol];
+        const capturedPiece = this.board[toRow][toCol];
+        
         // 保存移动历史
         this.moveHistory.push({
             from: [fromRow, fromCol],
             to: [toRow, toCol],
-            piece: this.board[fromRow][fromCol],
-            capturedPiece: this.board[toRow][toCol]
+            piece: piece,
+            capturedPiece: capturedPiece,
+            enPassantTarget: this.enPassantTarget,
+            piecesMoved: JSON.parse(JSON.stringify(this.piecesMoved))
         });
         
+        // 处理王车易位
+        if (piece.type === 'king') {
+            this.piecesMoved[piece.color].king = true;
+            
+            // 短易位
+            if (toCol - fromCol === 2) {
+                this.board[toRow][toCol - 1] = this.board[toRow][toCol + 1];
+                this.board[toRow][toCol + 1] = null;
+                this.piecesMoved[piece.color].rook2 = true;
+            }
+            // 长易位
+            else if (fromCol - toCol === 2) {
+                this.board[toRow][toCol + 1] = this.board[toRow][toCol - 2];
+                this.board[toRow][toCol - 2] = null;
+                this.piecesMoved[piece.color].rook1 = true;
+            }
+        }
+        // 处理车的移动
+        else if (piece.type === 'rook') {
+            if (fromRow === (piece.color === 'white' ? 7 : 0)) {
+                if (fromCol === 0) {
+                    this.piecesMoved[piece.color].rook1 = true;
+                } else if (fromCol === 7) {
+                    this.piecesMoved[piece.color].rook2 = true;
+                }
+            }
+        }
+        
+        // 处理吃过路兵
+        let enPassantCapturedPiece = null;
+        if (piece.type === 'pawn' && this.enPassantTarget && 
+            this.enPassantTarget.row === toRow && this.enPassantTarget.col === toCol) {
+            // 吃掉对方的兵
+            const capturedRow = piece.color === 'white' ? toRow + 1 : toRow - 1;
+            enPassantCapturedPiece = this.board[capturedRow][toCol];
+            this.board[capturedRow][toCol] = null;
+        }
+        
         // 执行移动
-        this.board[toRow][toCol] = this.board[fromRow][fromCol];
+        this.board[toRow][toCol] = piece;
         this.board[fromRow][fromCol] = null;
+        
+        // 处理兵的升变
+        if (piece.type === 'pawn' && (toRow === 0 || toRow === 7)) {
+            // 默认升变为后
+            this.board[toRow][toCol] = { type: 'queen', color: piece.color };
+        }
+        
+        // 设置吃过路兵目标
+        this.enPassantTarget = null;
+        if (piece.type === 'pawn' && Math.abs(toRow - fromRow) === 2) {
+            this.enPassantTarget = {
+                row: (fromRow + toRow) / 2,
+                col: toCol
+            };
+        }
         
         // 切换玩家
         this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+        
+        // 检查游戏状态（立即检查，确保游戏结束逻辑优先执行）
+        this.checkGameState();
         
         // 重新渲染棋盘
         this.renderBoard();
@@ -470,9 +587,37 @@ class ChessGame {
         const [fromRow, fromCol] = lastMove.from;
         const [toRow, toCol] = lastMove.to;
         
-        // 恢复移动
+        // 恢复棋子位置
         this.board[fromRow][fromCol] = lastMove.piece;
         this.board[toRow][toCol] = lastMove.capturedPiece;
+        
+        // 恢复吃过路兵
+        if (lastMove.piece.type === 'pawn' && 
+            Math.abs(toRow - fromRow) === 1 && 
+            Math.abs(toCol - fromCol) === 1 && 
+            !lastMove.capturedPiece) {
+            // 恢复被吃掉的兵
+            const capturedRow = lastMove.piece.color === 'white' ? toRow + 1 : toRow - 1;
+            this.board[capturedRow][toCol] = { type: 'pawn', color: lastMove.piece.color === 'white' ? 'black' : 'white' };
+        }
+        
+        // 恢复王车易位
+        if (lastMove.piece.type === 'king' && Math.abs(toCol - fromCol) === 2) {
+            // 恢复车的位置
+            if (toCol > fromCol) {
+                // 短易位
+                this.board[toRow][toCol + 1] = this.board[toRow][toCol - 1];
+                this.board[toRow][toCol - 1] = null;
+            } else {
+                // 长易位
+                this.board[toRow][toCol - 2] = this.board[toRow][toCol + 1];
+                this.board[toRow][toCol + 1] = null;
+            }
+        }
+        
+        // 恢复棋子移动状态和吃过路兵目标
+        this.piecesMoved = lastMove.piecesMoved;
+        this.enPassantTarget = lastMove.enPassantTarget;
         
         // 切换回上一个玩家
         this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
@@ -488,12 +633,197 @@ class ChessGame {
         this.selectedSquare = null;
         this.validMoves = [];
         this.moveHistory = [];
+        this.enPassantTarget = null;
+        // 重置棋子移动状态
+        this.piecesMoved = {
+            white: {
+                king: false,
+                rook1: false,
+                rook2: false
+            },
+            black: {
+                king: false,
+                rook1: false,
+                rook2: false
+            }
+        };
         this.renderBoard();
     }
     
     // 获取格子元素
     getSquareElement(row, col) {
         return document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    }
+    
+    // 检查是否被将军
+    isInCheck(color) {
+        // 找到王的位置
+        let kingPos = null;
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.type === 'king' && piece.color === color) {
+                    kingPos = [row, col];
+                    break;
+                }
+            }
+            if (kingPos) break;
+        }
+        
+        if (!kingPos) return false;
+        
+        // 检查对方是否有棋子可以攻击王
+        return this.isSquareAttacked(kingPos[0], kingPos[1], color);
+    }
+    
+    // 检查指定位置是否被对方攻击
+    isSquareAttacked(row, col, color) {
+        const opponentColor = color === 'white' ? 'black' : 'white';
+        
+        // 检查所有对方棋子的移动
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const piece = this.board[r][c];
+                if (piece && piece.color === opponentColor) {
+                    // 保存当前状态
+                    const originalPiece = this.board[row][col];
+                    this.board[row][col] = null;
+                    
+                    // 检查是否可以移动到目标位置
+                    const moves = this.getValidMoves(r, c);
+                    const canAttack = moves.some(([moveRow, moveCol]) => moveRow === row && moveCol === col);
+                    
+                    // 恢复状态
+                    this.board[row][col] = originalPiece;
+                    
+                    if (canAttack) return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    // 检查移动后是否会被将军
+    wouldBeInCheck(fromRow, fromCol, toRow, toCol) {
+        const piece = this.board[fromRow][fromCol];
+        const capturedPiece = this.board[toRow][toCol];
+        
+        // 模拟移动
+        this.board[toRow][toCol] = piece;
+        this.board[fromRow][fromCol] = null;
+        
+        // 检查是否被将军
+        const inCheck = this.isInCheck(piece.color);
+        
+        // 恢复状态
+        this.board[fromRow][fromCol] = piece;
+        this.board[toRow][toCol] = capturedPiece;
+        
+        return inCheck;
+    }
+    
+    // 检查是否有合法移动
+    hasValidMoves(color) {
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.color === color) {
+                    const moves = this.getValidMoves(row, col);
+                    if (moves.length > 0) return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    // 检查游戏状态（将军、将死、逼和、国王是否存在）
+    checkGameState() {
+        // 检查双方是否都还有国王（双重保险，防止意外情况）
+        let whiteKingPos = null;
+        let blackKingPos = null;
+        
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.board[row][col];
+                if (piece && piece.type === 'king') {
+                    if (piece.color === 'white') {
+                        whiteKingPos = [row, col];
+                    } else {
+                        blackKingPos = [row, col];
+                    }
+                }
+            }
+        }
+        
+        // 如果一方国王不存在，游戏结束
+        if (!whiteKingPos) {
+            alert('白方国王被吃掉！黑方获胜！');
+            this.endGame('black');
+            return;
+        }
+        
+        if (!blackKingPos) {
+            alert('黑方国王被吃掉！白方获胜！');
+            this.endGame('white');
+            return;
+        }
+        
+        const currentPlayerColor = this.currentPlayer;
+        const opponentColor = currentPlayerColor === 'white' ? 'black' : 'white';
+        
+        // 检查当前玩家是否被将军（因为玩家刚刚移动过）
+        if (this.isInCheck(currentPlayerColor)) {
+            // 检查当前玩家是否有合法移动
+            if (!this.hasValidMoves(currentPlayerColor)) {
+                // 将死
+                alert(`${currentPlayerColor === 'white' ? '白方' : '黑方'}被将死！${opponentColor === 'white' ? '白方' : '黑方'}获胜！`);
+                this.endGame(opponentColor);
+            } else {
+                // 将军
+                alert(`${currentPlayerColor === 'white' ? '白方' : '黑方'}被将军！`);
+            }
+        } else {
+            // 检查是否逼和
+            if (!this.hasValidMoves(currentPlayerColor)) {
+                alert('逼和！游戏结束。');
+                this.newGame();
+            }
+        }
+    }
+    
+    // 结束游戏（带自动判定获胜方）
+    endGame(winnerColor = null) {
+        const playerNames = this.getPlayerNames();
+        
+        if (!winnerColor) {
+            winnerColor = prompt('游戏结束！请输入获胜方（white/black）：');
+        }
+        
+        if (winnerColor === 'white' || winnerColor === 'black') {
+            const loserColor = winnerColor === 'white' ? 'black' : 'white';
+            
+            // 更新积分
+            this.scores[winnerColor] += 10;
+            this.scores[loserColor] += 1;
+            
+            // 更新本地排行榜
+            this.updatePlayerScore(playerNames[winnerColor], true);
+            this.updatePlayerScore(playerNames[loserColor], false);
+            
+            // 更新显示
+            this.updateScores();
+            
+            // 显示获胜信息
+            alert(`${playerNames[winnerColor]} 获胜！恭喜！\n\n得分情况：\n${playerNames[winnerColor]}: +10分\n${playerNames[loserColor]}: +1分`);
+            
+            // 重置游戏（可选，根据需求调整）
+            setTimeout(() => {
+                this.newGame();
+            }, 1000);
+        } else {
+            alert('输入无效，请输入 "white" 或 "black"');
+        }
     }
     
     // 设置事件监听器
