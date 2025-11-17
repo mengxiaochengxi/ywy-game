@@ -1,0 +1,11 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+.env
+*.swp
+*.swo
+*.bak
+.cache/
+dist/
+build/

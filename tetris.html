@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>于闻言俄罗斯方块</title>
+    <link rel="stylesheet" href="styles/tetris.css">
+</head>
+<body>
+    <div class="comet"></div>
+    <div class="comet"></div>
+    <div class="comet"></div>
+    <div class="comet"></div>
+    <div class="tetris-container">
+        <h1>于闻言俄罗斯方块</h1>
+        
+        <div class="game-area">
+            <div class="game-info">
+                <div class="score-board">
+                    <h3>分数</h3>
+                    <div id="score">0</div>
+                </div>
+                <div class="next-piece">
+                    <h3>下一个</h3>
+                    <div id="nextPiece"></div>
+                </div>
+                <div class="level-board">
+                    <h3>等级</h3>
+                    <div id="level">1</div>
+                </div>
+                <div class="lines-board">
+                    <h3>消除行数</h3>
+                    <div id="lines">0</div>
+                </div>
+            </div>
+            
+            <div class="game-board">
+                <canvas id="tetrisCanvas" width="300" height="600"></canvas>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn">开始游戏</button>
+            <button id="pauseBtn">暂停</button>
+            <button id="resetBtn">重新开始</button>
+            <button id="leaderboardBtn">排行榜</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>操作说明</h3>
+            <p>方向键：移动方块 | 上键：旋转 | 空格键：快速下落</p>
+        </div>
+    </div>
+    
+    <!-- 排行榜模态框 -->
+    <div id="leaderboardModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>排行榜</h2>
+            <div id="leaderboardList"></div>
+            <button id="closeLeaderboard">关闭</button>
+        </div>
+    </div>
+    
+    <!-- 游戏结束模态框 -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <h2>游戏结束</h2>
+            <div id="finalScore"></div>
+            <input type="text" id="playerName" placeholder="输入你的名字">
+            <button id="saveScore">保存分数</button>
+            <button id="playAgain">再玩一次</button>
+        </div>
+    </div>
+    
+    <script src="scripts/tetris.js"></script>
+</body>
+</html>

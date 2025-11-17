@@ -1,0 +1,593 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Rajdhani', 'Arial', sans-serif;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #00ffff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+/* 移除网格背景 */
+
+/* 星际穿越效果 - 移动星星 */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 160px 120px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 200px 160px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+        radial-gradient(3px 3px at 240px 90px, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 280px 140px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 320px 60px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 360px 180px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+        radial-gradient(1px 1px at 400px 110px, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0)),
+        radial-gradient(3px 3px at 440px 150px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0)),
+        radial-gradient(2px 2px at 480px 70px, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0));
+    background-repeat: repeat;
+    background-size: 500px 500px;
+    z-index: -2;
+    animation: starsMove 60s linear infinite;
+}
+
+@keyframes starsMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(500px, 500px); }
+}
+
+/* 星云效果 */
+.tetris-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at 20% 80%, rgba(100, 50, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 40% 40%, rgba(255, 100, 255, 0.05) 0%, transparent 50%);
+    z-index: -3;
+    animation: nebulaMove 40s ease-in-out infinite alternate;
+}
+
+@keyframes nebulaMove {
+    0% { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.2) rotate(5deg); }
+}
+
+/* 彗星效果 */
+@keyframes comet {
+    0% { 
+        transform: translate(-100px, 0) scale(0.5);
+        opacity: 0;
+    }
+    10% { 
+        opacity: 1;
+    }
+    90% { 
+        opacity: 1;
+    }
+    100% { 
+        transform: translate(120vw, 200px) scale(1);
+        opacity: 0;
+    }
+}
+
+.comet {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    z-index: -1;
+    box-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.8),
+        0 0 20px rgba(255, 255, 255, 0.6),
+        0 0 30px rgba(255, 255, 255, 0.4),
+        0 0 40px rgba(255, 255, 255, 0.2),
+        0 0 50px rgba(255, 255, 255, 0.1);
+}
+
+.comet::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.8), transparent);
+    transform: rotate(-45deg);
+    transform-origin: left center;
+}
+
+/* 添加多个彗星 */
+body > .comet:nth-child(1) {
+    top: 10%;
+    animation: comet 15s linear infinite 0s;
+}
+
+body > .comet:nth-child(2) {
+    top: 30%;
+    animation: comet 18s linear infinite 3s;
+    background: rgba(0, 255, 255, 0.9);
+    box-shadow: 
+        0 0 10px rgba(0, 255, 255, 0.8),
+        0 0 20px rgba(0, 255, 255, 0.6),
+        0 0 30px rgba(0, 255, 255, 0.4),
+        0 0 40px rgba(0, 255, 255, 0.2),
+        0 0 50px rgba(0, 255, 255, 0.1);
+}
+
+body > .comet:nth-child(3) {
+    top: 50%;
+    animation: comet 20s linear infinite 6s;
+    background: rgba(255, 100, 255, 0.9);
+    box-shadow: 
+        0 0 10px rgba(255, 100, 255, 0.8),
+        0 0 20px rgba(255, 100, 255, 0.6),
+        0 0 30px rgba(255, 100, 255, 0.4),
+        0 0 40px rgba(255, 100, 255, 0.2),
+        0 0 50px rgba(255, 100, 255, 0.1);
+}
+
+body > .comet:nth-child(4) {
+    top: 70%;
+    animation: comet 22s linear infinite 9s;
+    background: rgba(255, 255, 0, 0.9);
+    box-shadow: 
+        0 0 10px rgba(255, 255, 0, 0.8),
+        0 0 20px rgba(255, 255, 0, 0.6),
+        0 0 30px rgba(255, 255, 0, 0.4),
+        0 0 40px rgba(255, 255, 0, 0.2),
+        0 0 50px rgba(255, 255, 0, 0.1);
+}
+
+.tetris-container {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.3),
+        inset 0 0 50px rgba(0, 255, 255, 0.05);
+    text-align: center;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    max-width: 900px;
+    width: 100%;
+}
+
+h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin-bottom: 25px;
+    color: #00ffff;
+    text-shadow: 
+        0 0 15px rgba(0, 255, 255, 0.8),
+        0 0 30px rgba(0, 255, 255, 0.5),
+        0 0 45px rgba(0, 255, 255, 0.3);
+    letter-spacing: 4px;
+    animation: pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+    from { 
+        text-shadow: 
+            0 0 15px rgba(0, 255, 255, 0.8),
+            0 0 30px rgba(0, 255, 255, 0.5),
+            0 0 45px rgba(0, 255, 255, 0.3);
+    }
+    to { 
+        text-shadow: 
+            0 0 25px rgba(0, 255, 255, 1),
+            0 0 50px rgba(0, 255, 255, 0.7),
+            0 0 75px rgba(0, 255, 255, 0.5);
+    }
+}
+
+.game-area {
+    display: flex;
+    gap: 30px;
+    margin: 30px 0;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 180px;
+}
+
+.score-board, .next-piece, .level-board, .lines-board {
+    background: linear-gradient(135deg, rgba(12, 12, 12, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.2),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.score-board:hover, .next-piece:hover, .level-board:hover, .lines-board:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 10px 30px rgba(0, 255, 255, 0.3),
+        inset 0 0 30px rgba(0, 255, 255, 0.15);
+}
+
+.game-info h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #ff00ff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.6);
+}
+
+#score, #level, #lines {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #ffff00;
+    text-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+    font-family: 'Orbitron', monospace;
+}
+
+#nextPiece {
+    width: 130px;
+    height: 130px;
+    background-color: rgba(17, 17, 17, 0.95);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    border-radius: 8px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+.game-board {
+    background: linear-gradient(135deg, rgba(12, 12, 12, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.3),
+        inset 0 0 50px rgba(0, 255, 255, 0.1);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    position: relative;
+}
+
+.game-board::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #00ffff, #ff00ff, #00ffff, #ff00ff);
+    border-radius: 12px;
+    z-index: -1;
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+#tetrisCanvas {
+    border: 3px solid rgba(0, 255, 255, 0.5);
+    border-radius: 8px;
+    background-color: rgba(17, 17, 17, 0.95);
+    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #00ffff, #00cccc);
+    color: #000;
+    font-family: 'Rajdhani', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+}
+
+button:hover {
+    background: linear-gradient(135deg, #00cccc, #00aaaa);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.5);
+}
+
+button:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(0, 255, 255, 0.3);
+}
+
+button:disabled {
+    background: #333;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.5;
+}
+
+.instructions {
+    margin-top: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(12, 12, 12, 0.9) 0%, rgba(26, 26, 46, 0.9) 100%);
+    border-radius: 12px;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.2),
+        inset 0 0 30px rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+}
+
+.instructions h3 {
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 15px;
+    color: #ff00ff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.6);
+}
+
+.instructions p {
+    color: #00ffcc;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.instructions p span {
+    color: #ffff00;
+    font-weight: 600;
+    text-shadow: 0 0 8px rgba(255, 255, 0, 0.6);
+}
+
+/* 模态框样式 - 科技感增强 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(22, 33, 62, 0.98) 100%);
+    margin: 8% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 550px;
+    text-align: center;
+    box-shadow: 
+        0 0 50px rgba(0, 255, 255, 0.4),
+        inset 0 0 50px rgba(0, 255, 255, 0.05);
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    animation: slideIn 0.3s ease;
+}
+
+.modal-content h2 {
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 25px;
+    color: #00ffff;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+    letter-spacing: 3px;
+    font-size: 2rem;
+}
+
+.close {
+    color: #00ffff;
+    float: right;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+}
+
+.close:hover {
+    color: #ff00ff;
+    transform: rotate(90deg);
+    text-shadow: 0 0 15px rgba(255, 0, 255, 1);
+}
+
+#leaderboardList {
+    margin: 25px 0;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+/* 滚动条样式 */
+#leaderboardList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#leaderboardList::-webkit-scrollbar-track {
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+#leaderboardList::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.5);
+    border-radius: 4px;
+}
+
+#leaderboardList::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.8);
+}
+
+.leaderboard-item {
+    padding: 12px 15px;
+    margin: 8px 0;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(255, 0, 255, 0.05) 100%);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.leaderboard-item:hover {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+    border-color: rgba(0, 255, 255, 0.6);
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+}
+
+.leaderboard-item:first-child {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 215, 0, 0.1) 100%);
+    border-color: rgba(255, 215, 0, 0.6);
+    color: #ffff00;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.leaderboard-item:first-child:hover {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.4) 0%, rgba(255, 215, 0, 0.2) 100%);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+
+.leaderboard-item span:first-child {
+    color: #00ffcc;
+    font-weight: 600;
+}
+
+.leaderboard-item span:last-child {
+    color: #ffff00;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(255, 255, 0, 0.8);
+    font-size: 1.2em;
+}
+
+#finalScore {
+    font-size: 2.5rem;
+    margin-bottom: 25px;
+    font-weight: bold;
+    color: #ffff00;
+    text-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
+    font-family: 'Orbitron', monospace;
+}
+
+#playerName {
+    padding: 12px 15px;
+    font-size: 1.1rem;
+    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 8px;
+    margin-bottom: 25px;
+    width: 100%;
+    max-width: 350px;
+    background-color: rgba(17, 17, 17, 0.95);
+    color: #00ffff;
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.3s ease;
+}
+
+#playerName:focus {
+    outline: none;
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    background-color: rgba(17, 17, 17, 1);
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateY(-50px) scale(0.9);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .game-area {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .game-info {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .score-board, .next-piece, .level-board, .lines-board {
+        min-width: 120px;
+        padding: 15px;
+    }
+    
+    #nextPiece {
+        width: 100px;
+        height: 100px;
+    }
+    
+    #tetrisCanvas {
+        width: 240px;
+        height: 480px;
+    }
+    
+    .controls {
+        flex-wrap: wrap;
+    }
+    
+    h1 {
+        font-size: 2.5rem;
+    }
+    
+    .tetris-container {
+        padding: 20px;
+    }
+}
