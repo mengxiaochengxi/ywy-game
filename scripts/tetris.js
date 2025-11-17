@@ -47,6 +47,10 @@ class TetrisGame {
         this.generateNextPiece();
         this.startGame();
         
+        // 侧边栏排行榜
+        this.sidebarLeaderboardList = document.getElementById('sidebarLeaderboardList');
+        this.showSidebarLeaderboard();
+        
         // 绘制初始状态
         this.draw();
     }
@@ -436,6 +440,9 @@ class TetrisGame {
             await this.showLeaderboard();
         });
         
+        // 初始化侧边栏排行榜
+        this.showSidebarLeaderboard();
+        
         // 关闭排行榜
         document.querySelector('.close').addEventListener('click', () => {
             document.getElementById('leaderboardModal').style.display = 'none';
@@ -474,27 +481,35 @@ class TetrisGame {
     }
     
     // 获取排行榜
-    async getLeaderboard() {
+    async getLeaderboard(limit = 10) {
         try {
-            const response = await fetch(`${this.supabaseConfig.url}/rest/v1/tetris_leaderboard?select=*&order=score.desc&limit=10`, {
-                method: 'GET',
+            // 添加apikey头部，确保Supabase认证正确
+            const response = await fetch(`${this.supabaseConfig.url}/rest/v1/tetris_leaderboard?select=name,score,date&order=score.desc&limit=${limit}`, {
                 headers: {
                     'apikey': this.supabaseConfig.anonKey,
                     'Authorization': `Bearer ${this.supabaseConfig.anonKey}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                // 添加超时设置
+                signal: AbortSignal.timeout(5000)
             });
             
             if (!response.ok) {
-                throw new Error('Failed to fetch leaderboard');
+                console.error('Supabase response not ok:', response.status, response.statusText);
+                throw new Error(`Failed to fetch leaderboard: ${response.status} ${response.statusText}`);
             }
             
-            return await response.json();
+            const data = await response.json();
+            console.log('Successfully fetched leaderboard from Supabase:', data);
+            return data;
         } catch (error) {
             console.error('Error fetching leaderboard:', error);
             // 降级到localStorage
+            console.log('Falling back to localStorage...');
             const leaderboard = localStorage.getItem('tetrisLeaderboard');
-            return leaderboard ? JSON.parse(leaderboard) : [];
+            const result = leaderboard ? JSON.parse(leaderboard) : [];
+            console.log('Leaderboard from localStorage:', result);
+            return result.slice(0, limit);
         }
     }
     
@@ -509,32 +524,43 @@ class TetrisGame {
                     headers: {
                         'apikey': this.supabaseConfig.anonKey,
                         'Authorization': `Bearer ${this.supabaseConfig.anonKey}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
                     },
                     body: JSON.stringify({
                         name: playerName.trim(),
-                        score: this.score
-                    })
+                        score: this.score,
+                        date: new Date().toISOString()
+                    }),
+                    // 添加超时设置
+                    signal: AbortSignal.timeout(5000)
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to save score');
+                    console.error('Supabase response not ok:', response.status, response.statusText);
+                    throw new Error(`Failed to save score: ${response.status} ${response.statusText}`);
                 }
+                console.log('Score saved successfully to Supabase');
             } catch (error) {
                 console.error('Error saving score to Supabase:', error);
                 // 降级到localStorage
+                console.log('Falling back to localStorage...');
                 const leaderboard = JSON.parse(localStorage.getItem('tetrisLeaderboard') || '[]');
                 leaderboard.push({
                     name: playerName.trim(),
                     score: this.score,
-                    date: new Date().toLocaleDateString()
+                    date: new Date().toISOString()
                 });
                 leaderboard.sort((a, b) => b.score - a.score);
                 localStorage.setItem('tetrisLeaderboard', JSON.stringify(leaderboard.slice(0, 10)));
+                console.log('Score saved to localStorage');
             }
             
             // 关闭游戏结束模态框
             document.getElementById('gameOverModal').style.display = 'none';
+            
+            // 更新侧边栏排行榜
+            await this.showSidebarLeaderboard();
             
             // 显示排行榜
             await this.showLeaderboard();
@@ -568,6 +594,29 @@ class TetrisGame {
         }
         
         document.getElementById('leaderboardModal').style.display = 'block';
+    }
+    
+    // 显示侧边栏排行榜（前5名）
+    async showSidebarLeaderboard() {
+        const leaderboard = await this.getLeaderboard(5);
+        this.sidebarLeaderboardList.innerHTML = '';
+        
+        if (leaderboard.length === 0) {
+            this.sidebarLeaderboardList.innerHTML = '<p style="color: #00ffcc; padding: 20px; text-align: center; font-size: 0.9rem;">暂无记录</p>';
+            return;
+        }
+        
+        leaderboard.forEach((entry, index) => {
+            const item = document.createElement('div');
+            item.className = 'leaderboard-item';
+            
+            item.innerHTML = `
+                <span class="rank">${index + 1}</span>
+                <span class="name">${entry.name}</span>
+                <span class="score">${entry.score}</span>
+            `;
+            this.sidebarLeaderboardList.appendChild(item);
+        });
     }
 }
 
