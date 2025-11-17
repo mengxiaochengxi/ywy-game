@@ -1,0 +1,348 @@
+/* 彩色背景 */
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* 主容器 */
+.container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    max-width: 1400px;
+    width: 100%;
+}
+
+/* 游戏容器 */
+.game-container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform-style: preserve-3d;
+}
+
+/* 标题样式 */
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    text-shadow: 
+        3px 3px 6px rgba(0, 0, 0, 0.2),
+        0 0 10px rgba(102, 126, 234, 0.3);
+    transform: translateZ(10px);
+}
+
+/* 棋盘样式 */
+.chessboard {
+    display: grid;
+    grid-template-columns: repeat(8, 80px);
+    grid-template-rows: repeat(8, 80px);
+    gap: 0;
+    margin: 20px auto;
+    border: 8px solid #7b4317;
+    border-radius: 8px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 2px #333,
+        inset 0 0 20px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(145deg, #7b4317, #5a300f);
+    padding: 5px;
+    perspective: 1000px;
+}
+
+/* 棋盘格子 */
+.square {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px; /* 大棋子 */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+    transform-style: preserve-3d;
+}
+
+/* 浅色格子 */
+.light {
+    background: linear-gradient(145deg, #f0d9b5, #d4b88e);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+        inset 1px 0 0 rgba(255, 255, 255, 0.5),
+        inset -1px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+/* 深色格子 */
+.dark {
+    background: linear-gradient(145deg, #b58863, #9a7048);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+        inset 1px 0 0 rgba(255, 255, 255, 0.2),
+        inset -1px 0 0 rgba(0, 0, 0, 0.5);
+}
+
+/* 选中效果 */
+.square.selected {
+    background: linear-gradient(145deg, #ffeb3b, #fbc02d) !important;
+    box-shadow: 
+        0 5px 15px rgba(255, 235, 59, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* 可移动位置标记 */
+.square.valid-move::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 255, 0, 0.5);
+    border-radius: 50%;
+}
+
+/* 吃子位置标记 */
+.square.valid-capture::after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 0, 0, 0.3);
+    border-radius: 50%;
+}
+
+/* 悬停效果 */
+.square:hover {
+    transform: scale(1.05) translateY(-3px);
+    z-index: 1;
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* 棋子样式 - 添加立体效果 */
+.square[data-piece] {
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 10px rgba(255, 255, 255, 0.5);
+    transform: translateZ(10px);
+    transition: transform 0.2s ease;
+}
+
+/* 棋子悬停效果 */
+.square:hover[data-piece] {
+    text-shadow: 
+        3px 3px 6px rgba(0, 0, 0, 0.5),
+        0 0 15px rgba(255, 255, 255, 0.8);
+    transform: translateZ(20px);
+}
+
+/* 游戏信息区域 */
+.game-info {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* 回合指示器 */
+.turn-indicator {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+}
+
+.turn-indicator p {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+
+#current-turn {
+    color: #667eea;
+}
+
+/* 控制按钮 */
+.controls button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin: 0 10px;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 6px 20px rgba(102, 126, 234, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+}
+
+.controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.controls button:active {
+    transform: translateY(0);
+}
+
+/* 排行榜容器 */
+.leaderboard-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+/* 排行榜标题 */
+.leaderboard-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 2em;
+    text-align: center;
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.2),
+        0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+/* 玩家输入区域 */
+.player-input {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label {
+    font-weight: bold;
+    color: #555;
+}
+
+.input-group input {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+/* 排行榜表格 */
+.leaderboard {
+    width: 100%;
+}
+
+#leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#leaderboard-table th,
+#leaderboard-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+#leaderboard-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+}
+
+#leaderboard-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#leaderboard-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .leaderboard-container {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .chessboard {
+        grid-template-columns: repeat(8, 60px);
+        grid-template-rows: repeat(8, 60px);
+    }
+    
+    .square {
+        width: 60px;
+        height: 60px;
+        font-size: 35px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    .game-info {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .container {
+        padding: 10px;
+        gap: 20px;
+    }
+    
+    .game-container,
+    .leaderboard-container {
+        padding: 20px;
+    }
+    
+    #leaderboard-table th,
+    #leaderboard-table td {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+}
