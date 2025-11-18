@@ -149,6 +149,20 @@
         const NORMAL_FIRE_INTERVAL = 833; // 约1.2秒
         const POWERUP_FIRE_INTERVAL = 28; // 约30倍频率 (833/30 ≈ 28)
         
+        // 音频对象
+        let audioContext;
+        let backgroundMusic;
+        let startButtonSound;
+        let bulletSound;
+        let enemyFlySound;
+        let enemyExplosionSound;
+        let bossFlySound;
+        let bossExplosionSound;
+        let skillSound;
+        let playerDeathSound;
+        let gameOverSound;
+        let explosionSound1;
+        
         // Boss相关变量
         let boss = null;
         let enemiesKilled = 0;
@@ -385,6 +399,44 @@
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
             
+            // 初始化音频
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // 创建音频对象
+            backgroundMusic = new Audio('assets/music/背景音乐.mp3');
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.5;
+            
+            startButtonSound = new Audio('assets/music/开始按钮.wav');
+            startButtonSound.volume = 0.8;
+            
+            bulletSound = new Audio('assets/music/子弹.wav');
+            bulletSound.volume = 0.3;
+            
+            enemyFlySound = new Audio('assets/music/中飞机飞行.wav');
+            enemyFlySound.volume = 0.5;
+            
+            enemyExplosionSound = new Audio('assets/music/中飞机爆炸.wav');
+            enemyExplosionSound.volume = 0.8;
+            
+            bossFlySound = new Audio('assets/music/大飞机飞行.wav');
+            bossFlySound.volume = 0.6;
+            
+            bossExplosionSound = new Audio('assets/music/大飞机爆炸.mp3');
+            bossExplosionSound.volume = 0.8;
+            
+            skillSound = new Audio('assets/music/技能.wav');
+            skillSound.volume = 0.8;
+            
+            playerDeathSound = new Audio('assets/music/玩家死亡.wav');
+            playerDeathSound.volume = 0.8;
+            
+            gameOverSound = new Audio('assets/music/游戏结束.wav');
+            gameOverSound.volume = 0.8;
+            
+            explosionSound1 = new Audio('assets/music/爆炸1.mp3');
+            explosionSound1.volume = 0.7;
+            
             // 创建玩家
             player = new Player();
             
@@ -398,11 +450,16 @@
                 });
             }
             
+            
             // 事件监听
             window.addEventListener('keydown', handleKeyDown);
             window.addEventListener('mousemove', handleMouseMove);
             canvas.addEventListener('mousemove', handleMouseMove);
-            document.getElementById('startBtn').addEventListener('click', startGame);
+            document.getElementById('startBtn').addEventListener('click', function() {
+                startButtonSound.currentTime = 0;
+                startButtonSound.play().catch(e => console.log("Audio play error:", e));
+                startGame();
+            });
             
             // 开始游戏循环
             requestAnimationFrame(gameLoop);
@@ -478,16 +535,25 @@
         
         function pauseGame() {
             gameState = GAME_PAUSED;
+            backgroundMusic.pause();
         }
         
         function resumeGame() {
             gameState = GAME_PLAYING;
+            backgroundMusic.play().catch(e => console.log("Audio play error:", e));
         }
         
         function gameOver() {
             // 保存分数到排行榜
             addScoreToLeaderboard(score);
             gameState = GAME_OVER;
+            
+            // 停止背景音乐
+            backgroundMusic.pause();
+            
+            // 播放游戏结束音效
+            gameOverSound.currentTime = 0;
+            gameOverSound.play().catch(e => console.log("Audio play error:", e));
         }
         
         // 排行榜相关函数
@@ -621,13 +687,22 @@
                 
                 // 检查Boss是否被击败
                 if (boss.health <= 0) {
+                    bossExplosionSound.currentTime = 0;
+                    bossExplosionSound.play().catch(e => console.log("Audio play error:", e));
                     bossDefeated();
                 }
+                
+                // 播放Boss爆炸音效
+                explosionSound1.currentTime = 0;
+                explosionSound1.play().catch(e => console.log("Audio play error:", e));
             }
         }
         
         function spawnEnemy() {
             enemies.push(new Enemy());
+            // 播放中飞机飞行音效
+            enemyFlySound.currentTime = 0;
+            enemyFlySound.play().catch(e => console.log("Audio play error:", e));
         }
         
         function fireBullet() {
@@ -643,6 +718,10 @@
                 // 发射一条弹线
                 bullets.push(new Bullet(playerCenterX, bulletY));
             }
+            
+            // 播放子弹音效
+            bulletSound.currentTime = 0;
+            bulletSound.play().catch(e => console.log("Audio play error:", e));
         }
         
         // 关卡完成界面绘制
@@ -780,6 +859,13 @@
             checkCollisions();
             checkPowerUpCollisions();
             
+            // 如果背景音乐未播放且游戏正在进行，播放背景音乐
+            if ((gameState === GAME_PLAYING || gameState === BOSS_FIGHT) && backgroundMusic.paused) {
+                backgroundMusic.play().catch(e => console.log("Audio play error:", e));
+            } else if (gameState !== GAME_PLAYING && gameState !== BOSS_FIGHT && !backgroundMusic.paused) {
+                backgroundMusic.pause();
+            }
+            
             // 更新爆炸效果
             explosions = explosions.filter(explosion => {
                 return explosion.update(deltaTime);
@@ -814,6 +900,10 @@
                         
                         // 增加消灭的敌人计数
                         enemiesKilled++;
+                        
+                        // 播放中飞机爆炸音效
+                        enemyExplosionSound.currentTime = 0;
+                        enemyExplosionSound.play().catch(e => console.log("Audio play error:", e));
                     }
                 });
                 
@@ -862,6 +952,10 @@
                 lives--;
                 document.getElementById('lives').textContent = lives;
                 
+                // 播放玩家死亡音效
+                playerDeathSound.currentTime = 0;
+                playerDeathSound.play().catch(e => console.log("Audio play error:", e));
+                
                 if (lives <= 0) {
                     gameOver();
                 }
@@ -885,6 +979,10 @@
                 // 减少生命值
                 lives--;
                 document.getElementById('lives').textContent = lives;
+                
+                // 播放玩家死亡音效
+                playerDeathSound.currentTime = 0;
+                playerDeathSound.play().catch(e => console.log("Audio play error:", e));
 
                 if (lives <= 0) {
                     gameOver();
@@ -908,8 +1006,14 @@
                         // 激活子弹加强
                         bulletPowerUpActive = true;
                         bulletPowerUpTimeLeft = bulletPowerUpDuration;
+                        
+                        // 播放技能音效
+                        skillSound.currentTime = 0;
+                        skillSound.play().catch(e => console.log("Audio play error:", e));
                     } else if (powerUp.type === 'bomb') {
                         // 触发全屏攻击
+                        skillSound.currentTime = 0;
+                        skillSound.play().catch(e => console.log("Audio play error:", e));
                         useBomb();
                     }
                 }
@@ -948,6 +1052,10 @@
             
             // 清空屏幕上的敌人
             enemies = [];
+            
+            // 播放大飞机飞行音效
+            bossFlySound.currentTime = 0;
+            bossFlySound.play().catch(e => console.log("Audio play error:", e));
         }
         
         // Boss被击败
