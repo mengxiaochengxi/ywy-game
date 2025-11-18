@@ -189,7 +189,7 @@
                 this.speed = 5;
                 this.lives = 3;
                 this.image = new Image();
-                this.image.src = 'https://imgbed.pyz.co/file/1763464031882_player-1.png';
+                this.image.src = 'assets/images/player-1.png';
             }
             
             update(mouseX, mouseY) {
@@ -553,10 +553,43 @@
         
         // 游戏函数
         function startGame() {
+            // 重置游戏状态
             gameState = GAME_PLAYING;
+            score = 0;
+            lives = 3;
+            level = 1;
+            enemiesToKill = 20;
+            enemiesKilled = 0;
+            boss = null;
+            
+            // 隐藏开始菜单
             document.getElementById('start-menu').style.display = 'none';
-            autoFireEnabled = false;
+            
+            // 重置玩家
+            player = new Player();
+            
+            // 清空并初始化游戏对象
+            bullets = [];
+            enemies = [];
+            powerUps = [];
+            explosions = [];
+            
+            // 重置计时器和状态
+            enemySpawnTimer = 0;
+            bulletPowerUpTimer = 0;
+            bombPowerUpTimer = 0;
             autoFireTimer = 0;
+            autoFireEnabled = false;
+            bulletPowerUpActive = false;
+            bulletPowerUpTimeLeft = 0;
+            
+            // 更新UI
+            document.getElementById('score').textContent = score;
+            document.getElementById('lives').textContent = lives;
+            
+            // 播放背景音乐
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play().catch(e => console.log("Audio play error:", e));
         }
         
         function pauseGame() {
@@ -805,20 +838,20 @@
             });
             
             // 更新子弹
-        bullets.forEach((bullet, index) => {
-            bullet.update();
-            if (bullet.y < 0) {
-                bullets.splice(index, 1);
-            }
-        });
+            bullets.forEach((bullet, index) => {
+                bullet.update();
+                if (bullet.y < 0) {
+                    bullets.splice(index, 1);
+                }
+            });
 
-        // 更新Boss子弹
-        bossBullets.forEach((bullet, index) => {
-            bullet.update();
-            if (bullet.y > SCREEN_HEIGHT) {
-                bossBullets.splice(index, 1);
-            }
-        });
+            // 更新Boss子弹
+            bossBullets.forEach((bullet, index) => {
+                bullet.update();
+                if (bullet.y > SCREEN_HEIGHT) {
+                    bossBullets.splice(index, 1);
+                }
+            });
             
             // 更新敌人
             enemies.forEach((enemy, index) => {
@@ -1112,14 +1145,14 @@
             player.draw(ctx);
             
             // 绘制子弹
-        bullets.forEach(bullet => {
-            bullet.draw(ctx);
-        });
+            bullets.forEach(bullet => {
+                bullet.draw(ctx);
+            });
 
-        // 绘制Boss子弹
-        bossBullets.forEach(bullet => {
-            bullet.draw(ctx);
-        });
+            // 绘制Boss子弹
+            bossBullets.forEach(bullet => {
+                bullet.draw(ctx);
+            });
             
             // 绘制敌人
             enemies.forEach(enemy => {

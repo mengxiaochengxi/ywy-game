@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏中心</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <style>
+        .games-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .games-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .games-header h1 {
+            font-size: 2.5rem;
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .game-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        .game-image {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        .game-info {
+            padding: 1.5rem;
+        }
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        .game-description {
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .game-link {
+            display: inline-block;
+            background: #4299e1;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        .game-link:hover {
+            background: #3182ce;
+        }
+        .game-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        .status-working {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status-maintenance {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">长江对话，世界回响</div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="index.html#competition" class="competition-nav">赛事中心</a></li>
+                <li><a href="index.html#news">新闻动态</a></li>
+                <li><a href="index.html#events">瞭望世界</a></li>
+                <li><a href="index.html#rules">参与指南</a></li>
+                <li class="active"><a href="games.html">GAME</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline">登录</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 游戏中心 -->
+    <div class="games-container">
+        <div class="games-header">
+            <h1>游戏中心</h1>
+            <p>欢迎来到游戏中心，这里有各种有趣的游戏等待您的探索！</p>
+        </div>
+
+        <div class="games-grid">
+            <!-- 俄罗斯方块游戏 -->
+            <div class="game-card">
+                <div class="game-image">🎮</div>
+                <div class="game-info">
+                    <div class="game-status status-working">正常运行</div>
+                    <h3 class="game-title">俄罗斯方块</h3>
+                    <p class="game-description">经典的俄罗斯方块游戏，挑战你的反应速度和空间思维能力！</p>
+                    <a href="tetris.html" target="_blank" class="game-link">开始游戏</a>
+                </div>
+            </div>
+
+            <!-- 打飞机游戏 -->
+            <div class="game-card">
+                <div class="game-image">🚀</div>
+                <div class="game-info">
+                    <div class="game-status status-normal">正常运行</div>
+                    <h3 class="game-title">星际捍卫者（打飞机）</h3>
+                    <p class="game-description">一款经典的射击游戏，驾驶你的飞船抵御外星入侵！</p>
+                    <a href="star_defender_simple.html" target="_blank" class="game-link">尝试游戏</a>
+                </div>
+            </div>
+
+            <!-- 国际象棋 -->
+            <div class="game-card">
+                <div class="game-image">♟️</div>
+                <div class="game-info">
+                    <div class="game-status status-maintenance">开发中</div>
+                    <h3 class="game-title">国际象棋</h3>
+                    <p class="game-description">经典的策略棋盘游戏，展现你的智慧与谋略！</p>
+                    <a href="#" class="game-link" disabled>敬请期待</a>
+                </div>
+            </div>
+
+            <!-- 汉字文化周对对碰 -->
+            <div class="game-card">
+                <div class="game-image">🔤</div>
+                <div class="game-info">
+                    <div class="game-status status-maintenance">开发中</div>
+                    <h3 class="game-title">汉字文化周对对碰</h3>
+                    <p class="game-description">有趣的汉字配对游戏，学习中华文化知识！</p>
+                    <a href="#" class="game-link" disabled>敬请期待</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">长江对话，世界回响</div>
+                    <p class="footer-description">连接全球青年，共创未来对话</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">📘</a>
+                        <a href="#" class="social-link">🐦</a>
+                        <a href="#" class="social-link">📸</a>
+                        <a href="#" class="social-link">💬</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">快速链接</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="index.html#news">新闻动态</a></li>
+                        <li><a href="index.html#events">瞭望世界</a></li>
+                        <li><a href="index.html#rules">参与指南</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">合作伙伴</h3>
+                    <ul class="footer-links">
+                        <li>联合国教科文组织</li>
+                        <li>国际青年组织联盟</li>
+                        <li>全球大学联盟</li>
+                        <li>美团</li>
+                        <li>乐高</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">联系方式</h3>
+                    <ul class="footer-links">
+                        <li><span class="contact-icon">📧</span> contact@yangtze-dialogue.org</li>
+                        <li><span class="contact-icon">📞</span> +86 27 8888 8888</li>
+                        <li><span class="contact-icon">📍</span> 中国湖北省武汉市江汉区建设大道100号</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 长江对话组委会. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
