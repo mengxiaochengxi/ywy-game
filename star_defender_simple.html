@@ -57,14 +57,22 @@
             margin: 10px 0;
         }
         button {
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #00ff00;
-            color: #000;
+            padding: 0;
+            font-size: 0;
+            background: none;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin: 10px;
+        }
+        
+        #startBtn {
+            background-image: url('assets/images/start-button1.png');
+            width: 200px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
         button:hover {
             background-color: #00cc00;
@@ -155,7 +163,7 @@
                 this.speed = 5;
                 this.lives = 3;
                 this.image = new Image();
-                this.image.src = 'assets/images/player_ship.svg';
+                this.image.src = 'assets/images/player-1.png';
             }
             
             update(mouseX) {
@@ -206,7 +214,7 @@
                 this.y = -this.height;
                 this.speed = 3;
                 this.image = new Image();
-                this.image.src = 'assets/images/enemy_ship.svg';
+                this.image.src = 'assets/images/m-fly-1.png';
             }
             
             update() {
@@ -253,7 +261,7 @@
                 this.directionX = 1; // 1 向右，-1 向左
                 this.directionY = 1; // 1 向下，-1 向上
                 this.image = new Image();
-                this.image.src = 'assets/images/boss_ship.svg';
+                this.image.src = 'assets/images/b-fly-1.png';
                 this.fireTimer = 0;
                 this.fireInterval = 200; // 每秒发射5次子弹
             }
@@ -323,7 +331,7 @@
                 this.y = -this.height;
                 this.speed = 2;
                 this.image = new Image();
-                this.image.src = type === 'bullet' ? 'assets/images/powerup_bullet.svg' : 'assets/images/powerup_bomb.svg';
+                this.image.src = type === 'bullet' ? 'assets/images/skill2-3.png' : 'assets/images/skill1-3.png';
             }
             
             update() {
@@ -690,20 +698,20 @@
             });
             
             // 更新子弹
-            bullets.forEach((bullet, index) => {
-                bullet.update();
-                if (bullet.y < 0) {
-                    bullets.splice(index, 1);
-                }
-            });
+        bullets.forEach((bullet, index) => {
+            bullet.update();
+            if (bullet.y < 0) {
+                bullets.splice(index, 1);
+            }
+        });
 
-            // 更新Boss子弹
-            bossBullets.forEach((bullet, index) => {
-                bullet.update();
-                if (bullet.y > SCREEN_HEIGHT) {
-                    bossBullets.splice(index, 1);
-                }
-            });
+        // 更新Boss子弹
+        bossBullets.forEach((bullet, index) => {
+            bullet.update();
+            if (bullet.y > SCREEN_HEIGHT) {
+                bossBullets.splice(index, 1);
+            }
+        });
             
             // 更新敌人
             enemies.forEach((enemy, index) => {
@@ -759,10 +767,13 @@
             }
             
             // 自动射击
-            autoFireTimer += deltaTime;
-            if (autoFireTimer > 833) {
-                fireBullet();
-                autoFireTimer = 0;
+            if (!autoFireEnabled) {
+                autoFireTimer += deltaTime;
+                if (autoFireTimer > 833) {
+                    fireBullet();
+                    autoFireEnabled = false;
+                    autoFireTimer = 0;
+                }
             }
             
             // 碰撞检测
@@ -834,52 +845,52 @@
             });
             
             // 敌人与玩家碰撞
-            enemies.forEach((enemy, enemyIndex) => {
-                if (enemy.x < player.x + player.width &&
-                    enemy.x + enemy.width > player.x &&
-                    enemy.y < player.y + player.height &&
-                    enemy.y + enemy.height > player.y) {
-                    // 创建爆炸效果
-                    const explosionX = enemy.x + enemy.width / 2;
-                    const explosionY = enemy.y + enemy.height / 2;
-                    explosions.push(new Explosion(explosionX, explosionY));
-                    
-                    // 移除敌人
-                    enemies.splice(enemyIndex, 1);
-                    
-                    // 减少生命值
-                    lives--;
-                    document.getElementById('lives').textContent = lives;
-                    
-                    if (lives <= 0) {
-                        gameOver();
-                    }
+        enemies.forEach((enemy, enemyIndex) => {
+            if (enemy.x < player.x + player.width &&
+                enemy.x + enemy.width > player.x &&
+                enemy.y < player.y + player.height &&
+                enemy.y + enemy.height > player.y) {
+                // 创建爆炸效果
+                const explosionX = enemy.x + enemy.width / 2;
+                const explosionY = enemy.y + enemy.height / 2;
+                explosions.push(new Explosion(explosionX, explosionY));
+                
+                // 移除敌人
+                enemies.splice(enemyIndex, 1);
+                
+                // 减少生命值
+                lives--;
+                document.getElementById('lives').textContent = lives;
+                
+                if (lives <= 0) {
+                    gameOver();
                 }
-            });
+            }
+        });
 
-            // Boss子弹与玩家碰撞
-            bossBullets.forEach((bullet, bulletIndex) => {
-                if (bullet.x < player.x + player.width &&
-                    bullet.x + bullet.width > player.x &&
-                    bullet.y < player.y + player.height &&
-                    bullet.y + bullet.height > player.y) {
-                    // 创建爆炸效果
-                    const explosionX = player.x + player.width / 2;
-                    const explosionY = player.y + player.height / 2;
-                    explosions.push(new Explosion(explosionX, explosionY));
+        // Boss子弹与玩家碰撞
+        bossBullets.forEach((bullet, bulletIndex) => {
+            if (bullet.x < player.x + player.width &&
+                bullet.x + bullet.width > player.x &&
+                bullet.y < player.y + player.height &&
+                bullet.y + bullet.height > player.y) {
+                // 创建爆炸效果
+                const explosionX = player.x + player.width / 2;
+                const explosionY = player.y + player.height / 2;
+                explosions.push(new Explosion(explosionX, explosionY));
 
-                    // 移除子弹
-                    bossBullets.splice(bulletIndex, 1);
+                // 移除子弹
+                bossBullets.splice(bulletIndex, 1);
 
-                    // 减少生命值
-                    lives--;
-                    document.getElementById('lives').textContent = lives;
+                // 减少生命值
+                lives--;
+                document.getElementById('lives').textContent = lives;
 
-                    if (lives <= 0) {
-                        gameOver();
-                    }
+                if (lives <= 0) {
+                    gameOver();
                 }
-            });
+            }
+        });
         }
         
         // 检查道具碰撞
@@ -967,14 +978,14 @@
             player.draw(ctx);
             
             // 绘制子弹
-            bullets.forEach(bullet => {
-                bullet.draw(ctx);
-            });
+        bullets.forEach(bullet => {
+            bullet.draw(ctx);
+        });
 
-            // 绘制Boss子弹
-            bossBullets.forEach(bullet => {
-                bullet.draw(ctx);
-            });
+        // 绘制Boss子弹
+        bossBullets.forEach(bullet => {
+            bullet.draw(ctx);
+        });
             
             // 绘制敌人
             enemies.forEach(enemy => {
