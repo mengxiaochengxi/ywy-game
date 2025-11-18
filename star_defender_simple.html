@@ -144,8 +144,10 @@
         let autoFireTimer = 0;
         let autoFireEnabled = false;
         let bulletPowerUpActive = false;
-        let bulletPowerUpDuration = 10000; // 10秒
+        let bulletPowerUpDuration = 5000; // 5秒
         let bulletPowerUpTimeLeft = 0;
+        const NORMAL_FIRE_INTERVAL = 833; // 约1.2秒
+        const POWERUP_FIRE_INTERVAL = 28; // 约30倍频率 (833/30 ≈ 28)
         
         // Boss相关变量
         let boss = null;
@@ -767,13 +769,11 @@
             }
             
             // 自动射击
-            if (!autoFireEnabled) {
-                autoFireTimer += deltaTime;
-                if (autoFireTimer > 833) {
-                    fireBullet();
-                    autoFireEnabled = false;
-                    autoFireTimer = 0;
-                }
+            autoFireTimer += deltaTime;
+            const fireInterval = bulletPowerUpActive ? POWERUP_FIRE_INTERVAL : NORMAL_FIRE_INTERVAL;
+            if (autoFireTimer > fireInterval) {
+                fireBullet();
+                autoFireTimer = 0;
             }
             
             // 碰撞检测
