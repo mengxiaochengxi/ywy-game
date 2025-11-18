@@ -192,15 +192,20 @@
                 this.image.src = 'assets/images/player-1.png';
             }
             
-            update(mouseX) {
+            update(mouseX, mouseY) {
                 // 跟随鼠标移动
-                if (mouseX !== undefined) {
+                if (mouseX !== undefined && mouseY !== undefined) {
                     this.x = mouseX - this.width / 2;
+                    this.y = mouseY - this.height / 2;
                     
                     // 边界检查
                     if (this.x < 0) this.x = 0;
                     if (this.x + this.width > SCREEN_WIDTH) {
                         this.x = SCREEN_WIDTH - this.width;
+                    }
+                    if (this.y < 0) this.y = 0;
+                    if (this.y + this.height > SCREEN_HEIGHT) {
+                        this.y = SCREEN_HEIGHT - this.height;
                     }
                 }
             }
@@ -465,6 +470,8 @@
             window.addEventListener('keydown', handleKeyDown);
             window.addEventListener('mousemove', handleMouseMove);
             canvas.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('click', handleMouseClick);
+            canvas.addEventListener('click', handleMouseClick);
             document.getElementById('startBtn').addEventListener('click', function() {
                 startButtonSound.currentTime = 0;
                 startButtonSound.play().catch(e => console.log("Audio play error:", e));
@@ -530,8 +537,17 @@
         function handleMouseMove(e) {
             const rect = canvas.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
             if (gameState === GAME_PLAYING || gameState === BOSS_FIGHT) {
-                player.update(mouseX);
+                player.update(mouseX, mouseY);
+            }
+        }
+        
+        // 处理鼠标点击事件
+        function handleMouseClick(e) {
+            if (gameState === LEVEL_COMPLETE) {
+                // 点击鼠标进入下一关
+                nextLevel();
             }
         }
         
