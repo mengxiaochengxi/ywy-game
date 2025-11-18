@@ -1,0 +1,9 @@
+<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+  <!-- 子弹加强道具 -->
+  <circle cx="24" cy="24" r="22" fill="#0088ff" stroke="#ffffff" stroke-width="2"/>
+  <!-- 子弹图形 -->
+  <polygon points="24,14 14,24 24,34 34,24" fill="#ffffff"/>
+  <!-- 强化标志 -->
+  <circle cx="24" cy="24" r="10" fill="#0044aa"/>
+  <text x="24" y="28" font-family="Arial" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">+</text>
+</svg>

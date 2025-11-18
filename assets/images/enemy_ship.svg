@@ -1,0 +1,10 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <!-- 敌人飞船主体 -->
+  <polygon points="64,10 110,110 20,110" fill="#ff0000" stroke="#ffffff" stroke-width="2"/>
+  <!-- 敌人飞船细节 -->
+  <rect x="54" y="50" width="20" height="20" fill="#880000"/>
+  <circle cx="45" cy="45" r="5" fill="#ffff00"/>
+  <circle cx="83" cy="45" r="5" fill="#ffff00"/>
+  <!-- 敌人飞船引擎 -->
+  <polygon points="44,110 64,128 84,110" fill="#ff4400"/>
+</svg>

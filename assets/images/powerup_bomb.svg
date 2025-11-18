@@ -1,0 +1,10 @@
+<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+  <!-- 炸弹道具 -->
+  <circle cx="24" cy="24" r="22" fill="#ff0000" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="24" cy="24" r="16" fill="#880000" stroke="#ffffff" stroke-width="2"/>
+  <!-- 炸弹引线 -->
+  <path d="M24,8 C28,12 32,16 36,20" stroke="#ffff00" stroke-width="2" fill="none"/>
+  <circle cx="36" cy="20" r="4" fill="#ffff00"/>
+  <!-- 炸弹标志 -->
+  <text x="24" y="28" font-family="Arial" font-size="20" font-weight="bold" fill="#ffffff" text-anchor="middle">B</text>
+</svg>
