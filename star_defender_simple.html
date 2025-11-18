@@ -15,13 +15,19 @@
             background-color: #000;
             font-family: Arial, sans-serif;
             color: #fff;
+            overflow: hidden;
         }
         #game-container {
             position: relative;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
         }
         canvas {
             border: 2px solid #00ff00;
             background-color: #000;
+            width: 100%;
+            height: auto;
         }
         #game-info {
             position: absolute;
@@ -43,18 +49,22 @@
             align-items: center;
         }
         h1 {
-            font-size: 48px;
+            font-size: 28px;
             color: #00ff00;
             margin-bottom: 10px;
+            text-align: center;
         }
         h2 {
-            font-size: 24px;
+            font-size: 18px;
             color: cyan;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            text-align: center;
         }
         p {
-            font-size: 18px;
-            margin: 10px 0;
+            font-size: 14px;
+            margin: 8px 0;
+            text-align: center;
+            padding: 0 10px;
         }
         button {
             padding: 0;
@@ -68,8 +78,8 @@
         
         #startBtn {
             background-image: url('assets/images/start-button1.png');
-            width: 200px;
-            height: 60px;
+            width: 150px;
+            height: 45px;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -81,7 +91,7 @@
 </head>
 <body>
     <div id="game-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <canvas id="gameCanvas" width="360" height="640"></canvas>
         <div id="game-info">
             <div>生命值: <span id="lives">3</span></div>
             <div>分数: <span id="score">0</span></div>
@@ -101,8 +111,8 @@
 
     <script>
         // 游戏常量
-        const SCREEN_WIDTH = 800;
-        const SCREEN_HEIGHT = 600;
+        const SCREEN_WIDTH = 360; // 手机通用宽度
+        const SCREEN_HEIGHT = 640; // 保持4:3比例
         const FPS = 60;
         
         // 颜色
@@ -265,12 +275,12 @@
         // Boss类
         class Boss {
             constructor(level) {
-                this.width = 128;
-                this.height = 128;
+                this.width = 100; // 调整Boss大小以适应手机屏幕
+                this.height = 100;
                 this.x = (SCREEN_WIDTH - this.width) / 2; // 初始位置在屏幕中央
                 this.y = 50; // 初始位置在屏幕上1/3处
-                // 第一关血量增加10倍，后续每关增加15%
-                this.maxHealth = 100 * 10 * Math.pow(1.15, level - 1);
+                // 第一关血量增加10倍，后续每关增加前一关的3倍
+                this.maxHealth = 100 * 10 * Math.pow(3, level - 1);
                 this.health = this.maxHealth;
                 this.speedX = 2;
                 this.speedY = 1;
@@ -341,8 +351,8 @@
         class PowerUp {
             constructor(type) {
                 this.type = type; // 'bullet' or 'bomb'
-                this.width = 48;
-                this.height = 48;
+                this.width = 60; // 增加1/4倍 (48 * 1.25 = 60)
+                this.height = 60;
                 this.x = Math.random() * (SCREEN_WIDTH - this.width);
                 this.y = -this.height;
                 this.speed = 2;
