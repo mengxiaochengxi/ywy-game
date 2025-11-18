@@ -3,6 +3,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 .env
+supabaseinfo.txt
+关键信息.txt
+新建文本文档.txt
 *.swp
 *.swo
 *.bak
